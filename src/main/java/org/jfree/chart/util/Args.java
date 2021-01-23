@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2020, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -27,10 +27,11 @@
  * ---------
  * Args.java
  * ---------
- * (C) Copyright 2011-2017, by Object Refinery Limited.
+ * (C) Copyright 2011-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
+ *
  */
 
 package org.jfree.chart.util;
@@ -71,6 +72,19 @@ public class Args {
     }
     
     /**
+     * Throws an {@code IllegalArgumentException} if {@code value} is negative.
+     * 
+     * @param value  the value.
+     * @param name  the parameter name (for use in the exception message).
+     */
+    public static void requireNonNegative(double value, String name) {
+        if (value < 0) {
+            throw new IllegalArgumentException("Require '" + name + "' (" 
+                    + value + ") to be non-negative.");
+        }
+    }
+    
+    /**
      * Checks that the value falls within the specified range and, if it does
      * not, throws an {@code IllegalArgumentException}.
      * 
@@ -81,7 +95,7 @@ public class Args {
      */
     public static void requireInRange(int value, String name, 
             int lowerBound, int upperBound) {
-        if (value < lowerBound) {
+        if (value < lowerBound || value > upperBound) {
             throw new IllegalArgumentException("Require '" + name + "' (" 
                     + value + ") to be in the range " + lowerBound + " to " 
                     + upperBound);

@@ -27,20 +27,12 @@
  * ----------------------
  * DefaultPlotEditor.java
  * ----------------------
- * (C) Copyright 2005-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2020, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Andrzej Porebski;
  *                   Arnaud Lelievre;
  *                   Daniel Gredler;
- *
- * Changes:
- * --------
- * 24-Nov-2005 : Version 1, based on PlotPropertyEditPanel.java (DG);
- * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
- *               Jess Thrysoee (DG);
- * 27-Feb-2009 : Fixed bug 2612649, NullPointerException (DG);
- * 03-Nov-2011 : Added support for DefaultPolarPlotEditor (MH);
  *
  */
 
@@ -169,7 +161,15 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
         JPanel panel = createPlotPanel(plot);
         add(panel);
     }
-    
+
+    /**
+     * Creates and returns a panel for editing the settings of the specified
+     * plot.
+     * 
+     * @param plot  the plot.
+     * 
+     * @return A panel. 
+     */
     protected JPanel createPlotPanel(Plot plot) {
         this.plotInsets = plot.getInsets();
         this.backgroundPaintSample = new PaintSample(plot.getBackgroundPaint());
@@ -309,8 +309,15 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
         return panel;
     }
 
-    protected JTabbedPane createPlotTabs(Plot plot)
-    {
+    /**
+     * Creates and returns a tabbed pane containing controls for setting
+     * the attributes of the specified plot.
+     * 
+     * @param plot  the plot.
+     * 
+     * @return A tabbed pane. 
+     */
+    protected JTabbedPane createPlotTabs(Plot plot) {
         JTabbedPane tabs = new JTabbedPane();
         tabs.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 

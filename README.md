@@ -1,7 +1,7 @@
 JFreeChart
 ==========
 
-Version 1.5.1, 29 October 2020.
+Version 1.5.2, 31 December 2020.
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jfree/jfreechart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.jfree/jfreechart)
 
@@ -33,19 +33,17 @@ To use JFreeChart in your projects, add the following dependency to your build t
     <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </dependency>
 
 
 Building JFreeChart
 -------------------
-You can build JFreeChart using Maven.  The build requires JDK 8 or later.
+You can build JFreeChart using Maven with the following command (issued from the root directory of the project):
 
-#### Maven
-Using Maven you can build JFreeChart using the following command (issued from the root directory of the project):
+    mvn clean verify
 
-    mvn clean install
-
+The build requires JDK 8 or later.
 
 Demos
 -----
@@ -59,12 +57,25 @@ at GitHub:
 History
 -------
 
+##### Version 1.5.2 (31 December 2020)
+- observe series visibility flag in `ClusteredXYBarRenderer` ([#89](https://github.com/jfree/jfreechart/issues/89));
+- apply rendering hints to overlays ([#187](https://github.com/jfree/jfreechart/issues/187));
+- don't draw disabled outlines on crosshair labels ([#189](https://github.com/jfree/jfreechart/pull/189));
+- observe axis visibility flag in `PeriodAxis` ([#198](https://github.com/jfree/jfreechart/issues/198));
+- ensure label offsets are used in `CrosshairOverlay` ([#190](https://github.com/jfree/jfreechart/pull/190));
+- remove alpha channel from copy-to-clipboard ([#182](https://github.com/jfree/jfreechart/issues/182));
+- set flag in XML parser to avoid XML eXternal Entity injection (XXE) ([#130](https://github.com/jfree/jfreechart/issues/130));
+- update French translations ([#186](https://github.com/jfree/jfreechart/pull/186));
+- fix "Save_as" entries in localisation files ([#184](https://github.com/jfree/jfreechart/pull/184));
+- add flags for visibility of outliers in `BoxAndWhiskerRenderer` ([#79](https://github.com/jfree/jfreechart/pull/79));
+- deprecated `PiePlot3D` and related methods, for 3D pie charts, use Orson Charts (https://github.com/jfree/orson-charts).  
+
 ##### Version 1.5.1 (29 October 2020)
-- add DeviationStepRenderer (PR #173)
-- modify buffer in ChartPanel to handle high DPI displays (bug #170);
-- fix for exception on extreme zoom on NumberAxis (bug #64);
-- fix for LayeredBarRenderer (bug #169);
-- add Catalan translations (PR #117);
+- add `DeviationStepRenderer` ([#173](https://github.com/jfree/jfreechart/pull/173))
+- modify buffer in `ChartPanel` to handle high DPI displays ([#170](https://github.com/jfree/jfreechart/issues/170));
+- fix for exception on extreme zoom on `NumberAxis` ([#64](https://github.com/jfree/jfreechart/issues/64));
+- fix for `LayeredBarRenderer` ([#169](https://github.com/jfree/jfreechart/issues/169));
+- add Catalan translations ([#117](https://github.com/jfree/jfreechart/pull/117));
 - add automatic module name `org.jfree.jfreechart`;
 - migrate to JUnit 5;
 - raise minimum requirement to Java 8 or later.
@@ -75,7 +86,7 @@ History
 - JFreeSVG updated to version 3.2;
 - OrsonPDF updated to version 1.7;
 - JCommon removed as a dependency, and required classes incorporated directly;
-- pull request #4 improvements to `XYStepRenderer`;
+- improvements to `XYStepRenderer` ([#4](https://github.com/jfree/jfreechart/pull/4));
 - bug #36 fix for crosshairs with multiple datasets / axes;
 - bug #25 fix for `DateAxis.previousStandardDate()` method;
 - bug #19 fix for default time zone in `SegmentedDateAxis`;

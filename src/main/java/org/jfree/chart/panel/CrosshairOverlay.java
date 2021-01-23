@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2020, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -27,17 +27,10 @@
  * ---------------------
  * CrosshairOverlay.java
  * ---------------------
- * (C) Copyright 2011-2017, by Object Refinery Limited.
+ * (C) Copyright 2011-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   John Matthews;
- *
- * Changes:
- * --------
- * 09-Apr-2009 : Version 1 (DG);
- * 19-May-2009 : Fixed FindBugs warnings, patch by Michal Wozniak (DG);
- * 02-Jul-2013 : Use ParamChecks (DG);
- * 05-Mar-2016 : Fix label outline stroke (DG);
+ * Contributor(s):   John Matthews, Michal Wozniak;
  *
  */
 
@@ -74,7 +67,9 @@ import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
- * An overlay for a {@link ChartPanel} that draws crosshairs on a plot.
+ * An overlay for a {@link ChartPanel} that draws crosshairs on a chart.  If 
+ * you are using the JavaFX extensions for JFreeChart, then you should use
+ * the {@code CrosshairOverlayFX} class.
  *
  * @since 1.0.13
  */
@@ -88,16 +83,16 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
     private List<Crosshair> yCrosshairs;
 
     /**
-     * Default constructor.
+     * Creates a new overlay that initially contains no crosshairs.
      */
     public CrosshairOverlay() {
         super();
-        this.xCrosshairs = new java.util.ArrayList<Crosshair>();
-        this.yCrosshairs = new java.util.ArrayList<Crosshair>();
+        this.xCrosshairs = new ArrayList<>();
+        this.yCrosshairs = new ArrayList<>();
     }
 
     /**
-     * Adds a crosshair against the domain axis and sends an
+     * Adds a crosshair against the domain axis (x-axis) and sends an
      * {@link OverlayChangeEvent} to all registered listeners.
      *
      * @param crosshair  the crosshair ({@code null} not permitted).
@@ -130,14 +125,14 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
 
     /**
      * Clears all the domain crosshairs from the overlay and sends an
-     * {@link OverlayChangeEvent} to all registered listeners.
+     * {@link OverlayChangeEvent} to all registered listeners (unless there
+     * were no crosshairs to begin with).
      */
     public void clearDomainCrosshairs() {
         if (this.xCrosshairs.isEmpty()) {
-            return;  // nothing to do
+            return;  // nothing to do - avoids firing change event
         }
-        List<Crosshair> crosshairs = getDomainCrosshairs();
-        for (Crosshair c : crosshairs) {
+        for (Crosshair c : getDomainCrosshairs()) {
             this.xCrosshairs.remove(c);
             c.removePropertyChangeListener(this);
         }
@@ -150,7 +145,7 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
      * @return A list of crosshairs.
      */
     public List<Crosshair> getDomainCrosshairs() {
-        return new ArrayList<Crosshair>(this.xCrosshairs);
+        return new ArrayList<>(this.xCrosshairs);
     }
 
     /**
@@ -184,14 +179,14 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
 
     /**
      * Clears all the range crosshairs from the overlay and sends an
-     * {@link OverlayChangeEvent} to all registered listeners.
+     * {@link OverlayChangeEvent} to all registered listeners (unless there
+     * were no crosshairs to begin with).
      */
     public void clearRangeCrosshairs() {
         if (this.yCrosshairs.isEmpty()) {
-            return;  // nothing to do
+            return;  // nothing to do - avoids change notification
         }
-        List<Crosshair> crosshairs = getRangeCrosshairs();
-        for (Crosshair c : crosshairs) {
+        for (Crosshair c : getRangeCrosshairs()) {
             this.yCrosshairs.remove(c);
             c.removePropertyChangeListener(this);
         }
@@ -204,7 +199,7 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
      * @return A list of crosshairs.
      */
     public List<Crosshair> getRangeCrosshairs() {
-        return new ArrayList<Crosshair>(this.yCrosshairs);
+        return new ArrayList<>(this.yCrosshairs);
     }
 
     /**
@@ -219,7 +214,10 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
     }
 
     /**
-     * Paints the crosshairs in the layer.
+     * Renders the crosshairs in the overlay on top of the chart that has just
+     * been rendered in the specified {@code chartPanel}.  This method is
+     * called by the JFreeChart framework, you won't normally call it from
+     * user code.
      *
      * @param g2  the graphics target.
      * @param chartPanel  the chart panel.
@@ -233,32 +231,26 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
         XYPlot plot = (XYPlot) chart.getPlot();
         ValueAxis xAxis = plot.getDomainAxis();
         RectangleEdge xAxisEdge = plot.getDomainAxisEdge();
-        Iterator<Crosshair> iterator = this.xCrosshairs.iterator();
-        while (iterator.hasNext()) {
-            Crosshair ch = iterator.next();
+        for (Crosshair ch : this.xCrosshairs) {
             if (ch.isVisible()) {
                 double x = ch.getValue();
                 double xx = xAxis.valueToJava2D(x, dataArea, xAxisEdge);
                 if (plot.getOrientation() == PlotOrientation.VERTICAL) {
                     drawVerticalCrosshair(g2, dataArea, xx, ch);
-                }
-                else {
+                } else {
                     drawHorizontalCrosshair(g2, dataArea, xx, ch);
                 }
             }
         }
         ValueAxis yAxis = plot.getRangeAxis();
         RectangleEdge yAxisEdge = plot.getRangeAxisEdge();
-        iterator = this.yCrosshairs.iterator();
-        while (iterator.hasNext()) {
-            Crosshair ch = iterator.next();
+        for (Crosshair ch : this.yCrosshairs) {
             if (ch.isVisible()) {
                 double y = ch.getValue();
                 double yy = yAxis.valueToJava2D(y, dataArea, yAxisEdge);
                 if (plot.getOrientation() == PlotOrientation.VERTICAL) {
                     drawHorizontalCrosshair(g2, dataArea, yy, ch);
-                }
-                else {
+                } else {
                     drawVerticalCrosshair(g2, dataArea, yy, ch);
                 }
             }
@@ -286,37 +278,39 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
             g2.setStroke(crosshair.getStroke());
             g2.draw(line);
             if (crosshair.isLabelVisible()) {
-                Font savedFont = g2.getFont();
-                g2.setFont(crosshair.getLabelFont());
                 String label = crosshair.getLabelGenerator().generateLabel(
                         crosshair);
-                RectangleAnchor anchor = crosshair.getLabelAnchor();
-                Point2D pt = calculateLabelPoint(line, anchor, 5, 5);
-                float xx = (float) pt.getX();
-                float yy = (float) pt.getY();
-                TextAnchor alignPt = textAlignPtForLabelAnchorH(anchor);
-                Shape hotspot = TextUtils.calculateRotatedStringBounds(
-                        label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
-                if (!dataArea.contains(hotspot.getBounds2D())) {
-                    anchor = flipAnchorV(anchor);
-                    pt = calculateLabelPoint(line, anchor, 5, 5);
-                    xx = (float) pt.getX();
-                    yy = (float) pt.getY();
-                    alignPt = textAlignPtForLabelAnchorH(anchor);
-                    hotspot = TextUtils.calculateRotatedStringBounds(
-                           label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
-                }
+                if (label != null && !label.isEmpty()) {
+                    Font savedFont = g2.getFont();
+                    g2.setFont(crosshair.getLabelFont());
+                    RectangleAnchor anchor = crosshair.getLabelAnchor();
+                    Point2D pt = calculateLabelPoint(line, anchor, crosshair.getLabelXOffset(), crosshair.getLabelYOffset());
+                    float xx = (float) pt.getX();
+                    float yy = (float) pt.getY();
+                    TextAnchor alignPt = textAlignPtForLabelAnchorH(anchor);
+                    Shape hotspot = TextUtils.calculateRotatedStringBounds(
+                            label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
+                    if (!dataArea.contains(hotspot.getBounds2D())) {
+                        anchor = flipAnchorV(anchor);
+                        pt = calculateLabelPoint(line, anchor, crosshair.getLabelXOffset(), crosshair.getLabelYOffset());
+                        xx = (float) pt.getX();
+                        yy = (float) pt.getY();
+                        alignPt = textAlignPtForLabelAnchorH(anchor);
+                        hotspot = TextUtils.calculateRotatedStringBounds(
+                               label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
+                    }
 
-                g2.setPaint(crosshair.getLabelBackgroundPaint());
-                g2.fill(hotspot);
-                if (crosshair.isLabelOutlineVisible()) {
-                    g2.setPaint(crosshair.getLabelOutlinePaint());
-                    g2.setStroke(crosshair.getLabelOutlineStroke());
+                    g2.setPaint(crosshair.getLabelBackgroundPaint());
+                    g2.fill(hotspot);
+                    if (crosshair.isLabelOutlineVisible()) {
+                        g2.setPaint(crosshair.getLabelOutlinePaint());
+                        g2.setStroke(crosshair.getLabelOutlineStroke());
+                        g2.draw(hotspot);
+                    }
+                    g2.setPaint(crosshair.getLabelPaint());
+                    TextUtils.drawAlignedString(label, g2, xx, yy, alignPt);
+                    g2.setFont(savedFont);
                 }
-                g2.draw(hotspot);
-                g2.setPaint(crosshair.getLabelPaint());
-                TextUtils.drawAlignedString(label, g2, xx, yy, alignPt);
-                g2.setFont(savedFont);
             }
             g2.setPaint(savedPaint);
             g2.setStroke(savedStroke);
@@ -343,36 +337,38 @@ public class CrosshairOverlay extends AbstractOverlay implements Overlay,
             g2.setStroke(crosshair.getStroke());
             g2.draw(line);
             if (crosshair.isLabelVisible()) {
-                Font savedFont = g2.getFont();
-                g2.setFont(crosshair.getLabelFont());
                 String label = crosshair.getLabelGenerator().generateLabel(
                         crosshair);
-                RectangleAnchor anchor = crosshair.getLabelAnchor();
-                Point2D pt = calculateLabelPoint(line, anchor, 5, 5);
-                float xx = (float) pt.getX();
-                float yy = (float) pt.getY();
-                TextAnchor alignPt = textAlignPtForLabelAnchorV(anchor);
-                Shape hotspot = TextUtils.calculateRotatedStringBounds(
-                        label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
-                if (!dataArea.contains(hotspot.getBounds2D())) {
-                    anchor = flipAnchorH(anchor);
-                    pt = calculateLabelPoint(line, anchor, 5, 5);
-                    xx = (float) pt.getX();
-                    yy = (float) pt.getY();
-                    alignPt = textAlignPtForLabelAnchorV(anchor);
-                    hotspot = TextUtils.calculateRotatedStringBounds(
-                           label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
+                if (label != null && !label.isEmpty()) {
+                    Font savedFont = g2.getFont();
+                    g2.setFont(crosshair.getLabelFont());
+                    RectangleAnchor anchor = crosshair.getLabelAnchor();
+                    Point2D pt = calculateLabelPoint(line, anchor, crosshair.getLabelXOffset(), crosshair.getLabelYOffset());
+                    float xx = (float) pt.getX();
+                    float yy = (float) pt.getY();
+                    TextAnchor alignPt = textAlignPtForLabelAnchorV(anchor);
+                    Shape hotspot = TextUtils.calculateRotatedStringBounds(
+                            label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
+                    if (!dataArea.contains(hotspot.getBounds2D())) {
+                        anchor = flipAnchorH(anchor);
+                        pt = calculateLabelPoint(line, anchor, crosshair.getLabelXOffset(), crosshair.getLabelYOffset());
+                        xx = (float) pt.getX();
+                        yy = (float) pt.getY();
+                        alignPt = textAlignPtForLabelAnchorV(anchor);
+                        hotspot = TextUtils.calculateRotatedStringBounds(
+                               label, g2, xx, yy, alignPt, 0.0, TextAnchor.CENTER);
+                    }
+                    g2.setPaint(crosshair.getLabelBackgroundPaint());
+                    g2.fill(hotspot);
+                    if (crosshair.isLabelOutlineVisible()) {
+                        g2.setPaint(crosshair.getLabelOutlinePaint());
+                        g2.setStroke(crosshair.getLabelOutlineStroke());
+                        g2.draw(hotspot);
+                    }
+                    g2.setPaint(crosshair.getLabelPaint());
+                    TextUtils.drawAlignedString(label, g2, xx, yy, alignPt);
+                    g2.setFont(savedFont);
                 }
-                g2.setPaint(crosshair.getLabelBackgroundPaint());
-                g2.fill(hotspot);
-                if (crosshair.isLabelOutlineVisible()) {
-                    g2.setPaint(crosshair.getLabelOutlinePaint());
-                    g2.setStroke(crosshair.getLabelOutlineStroke());
-                    g2.draw(hotspot);
-                }
-                g2.setPaint(crosshair.getLabelPaint());
-                TextUtils.drawAlignedString(label, g2, xx, yy, alignPt);
-                g2.setFont(savedFont);
             }
             g2.setPaint(savedPaint);
             g2.setStroke(savedStroke);

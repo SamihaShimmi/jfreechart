@@ -27,18 +27,10 @@
  * ----------------
  * KeyedValues.java
  * ----------------
- * (C) Copyright 2002-2016, by Object Refinery Limited.
+ * (C) Copyright 2002-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 23-Oct-2002 : Version 1 (DG);
- * 12-Jan-2005 : Updated Javadocs to specify new behaviour when key
- *               is not recognised (DG);
- * ------------- JFREECHART 1.0.0 ---------------------------------------------
- * 02-May-2006 : Updated API docs (DG);
+ * Contributor(s):   Tracy Hiltbrand (generics for bug fix to PiePlot);
  *
  */
 
@@ -50,10 +42,12 @@ import java.util.List;
  * An ordered list of (key, value) items where the keys are unique and
  * non-{@code null}.
  *
+ * @param <K> the key type ({@code String} is a good default).
+ * 
  * @see Values
  * @see DefaultKeyedValues
  */
-public interface KeyedValues extends Values {
+public interface KeyedValues<K extends Comparable<K>> extends Values {
 
     /**
      * Returns the key associated with the item at a given position.  Note
@@ -68,7 +62,7 @@ public interface KeyedValues extends Values {
      * @throws IndexOutOfBoundsException if {@code index} is not in the
      *     specified range.
      */
-    public Comparable getKey(int index);
+    public K getKey(int index);
 
     /**
      * Returns the index for a given key.
@@ -79,7 +73,7 @@ public interface KeyedValues extends Values {
      *
      * @throws IllegalArgumentException if {@code key} is {@code null}.
      */
-    public int getIndex(Comparable key);
+    public int getIndex(K key);
 
     /**
      * Returns the keys for the values in the collection.  Note that you can
@@ -89,7 +83,7 @@ public interface KeyedValues extends Values {
      *
      * @return The keys (never {@code null}).
      */
-    public List getKeys();
+    public List<K> getKeys();
 
     /**
      * Returns the value for a given key.
@@ -100,6 +94,6 @@ public interface KeyedValues extends Values {
      *
      * @throws UnknownKeyException if the key is not recognised.
      */
-    public Number getValue(Comparable key);
+    public Number getValue(K key);
 
 }

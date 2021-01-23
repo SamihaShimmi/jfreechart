@@ -34,17 +34,6 @@
  *                       http://www.wam.umd.edu/~petersd/);
  *                   David Gilbert (for Object Refinery Limited);
  *
- * Changes:
- * --------
- * 25-Jul-2007 : Version 1, contributed by Klaus Rheinwald (DG);
- * 03-Aug-2007 : Added new constructor (KR);
- * 25-Oct-2007 : Prevent duplicate control points (KR);
- * 19-May-2009 : Fixed FindBugs warnings, patch by Michal Wozniak (DG);
- * 14-Sep-2013 : Replaced Vector with List, general cleanup (KR);
- * 15-Sep-2013 : Added support to fill the area 'under' (between '0' and) the 
- *               spline(KR);
- * 15-Sep-2013 : Replaced ControlPoint with Point2D.Float (KR);
- *
  */
 
 package org.jfree.chart.renderer.xy;
@@ -77,8 +66,7 @@ import org.jfree.data.xy.XYDataset;
  * {@code XYSplineRendererDemo1.java} program included in the JFreeChart
  * demo collection:
  * <br><br>
- * <img src="../../../../../images/XYSplineRendererSample.png"
- * alt="XYSplineRendererSample.png">
+ * <img src="doc-files/XYSplineRendererSample.png" alt="XYSplineRendererSample.png">
  *
  * @since 1.0.7
  */
@@ -90,9 +78,17 @@ public class XYSplineRenderer extends XYLineAndShapeRenderer {
      * @since 1.0.17
      */
     public static enum FillType {
+       
+        /** No fill. */
         NONE,
+        
+        /** Fill towards zero. */
         TO_ZERO,
+
+        /** Fill to lower bound. */
         TO_LOWER_BOUND,
+        
+        /** Fill to upper bound. */
         TO_UPPER_BOUND
     }
     

@@ -27,34 +27,11 @@
  * -----------------------
  * DefaultKeyedValues.java
  * -----------------------
- * (C) Copyright 2002-2016, by Object Refinery Limited.
+ * (C) Copyright 2002-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Thomas Morgner;
- *
- * Changes:
- * --------
- * 31-Oct-2002 : Version 1 (DG);
- * 11-Feb-2003 : Fixed bug in getValue(key) method for unrecognised key (DG);
- * 05-Mar-2003 : Added methods to sort stored data 'by key' or 'by value' (DG);
- * 13-Mar-2003 : Implemented Serializable (DG);
- * 08-Apr-2003 : Modified removeValue(Comparable) method to fix bug 717049 (DG);
- * 18-Aug-2003 : Implemented Cloneable (DG);
- * 27-Aug-2003 : Moved SortOrder from org.jfree.data --> org.jfree.util (DG);
- * 09-Feb-2004 : Modified getIndex() method - see bug report 893256 (DG);
- * 15-Sep-2004 : Updated clone() method and added PublicCloneable
- *               interface (DG);
- * 25-Nov-2004 : Small update to the clone() implementation (DG);
- * 24-Feb-2005 : Added methods addValue(Comparable, double) and
- *               setValue(Comparable, double) for convenience (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
- * 31-Jul-2006 : Added a clear() method (DG);
- * 01-Aug-2006 : Added argument check to getIndex() method (DG);
- * 30-Apr-2007 : Added insertValue() methods (DG);
- * 31-Oct-2007 : Performance improvements by using separate lists for keys and
- *               values (TM);
- * 21-Nov-2007 : Fixed bug in removeValue() method from previous patch (DG);
- * 03-Jul-2013 : Use ParamChecks (DG);
+ *                   Tracy Hiltbrand (generics for bug fix to PiePlot);
  *
  */
 
@@ -66,6 +43,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.chart.util.SortOrder;
@@ -73,32 +51,34 @@ import org.jfree.chart.util.SortOrder;
 /**
  * An ordered list of (key, value) items.  This class provides a default
  * implementation of the {@link KeyedValues} interface.
+ * 
+ * @param <K> the key type ({@code String} is a good default).
  */
-public class DefaultKeyedValues implements KeyedValues, Cloneable,
-        PublicCloneable, Serializable {
+public class DefaultKeyedValues<K extends Comparable<K>> 
+        implements KeyedValues<K>, Cloneable, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = 8468154364608194797L;
 
     /** Storage for the keys. */
-    private ArrayList keys;
+    private List<K> keys;
 
     /** Storage for the values. */
-    private ArrayList values;
+    private List<Number> values;
 
     /**
      * Contains (key, Integer) mappings, where the Integer is the index for
      * the key in the list.
      */
-    private HashMap indexMap;
+    private Map<K, Integer> indexMap;
 
   /**
      * Creates a new collection (initially empty).
      */
     public DefaultKeyedValues() {
-        this.keys = new ArrayList();
-        this.values = new ArrayList();
-        this.indexMap = new HashMap();
+        this.keys = new ArrayList<>();
+        this.values = new ArrayList<>();
+        this.indexMap = new HashMap<>();
     }
 
     /**
@@ -122,7 +102,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      */
     @Override
     public Number getValue(int item) {
-        return (Number) this.values.get(item);
+        return this.values.get(item);
     }
 
     /**
@@ -135,8 +115,8 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @throws IndexOutOfBoundsException if {@code item} is out of bounds.
      */
     @Override
-    public Comparable getKey(int index) {
-        return (Comparable) this.keys.get(index);
+    public K getKey(int index) {
+        return this.keys.get(index);
     }
 
     /**
@@ -150,9 +130,9 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      *     {@code null}.
      */
     @Override
-    public int getIndex(Comparable key) {
+    public int getIndex(K key) {
         Args.nullNotPermitted(key, "key");
-        final Integer i = (Integer) this.indexMap.get(key);
+        final Integer i = this.indexMap.get(key);
         if (i == null) {
             return -1;  // key not found
         }
@@ -165,8 +145,8 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @return The keys (never {@code null}).
      */
     @Override
-    public List getKeys() {
-        return (List) this.keys.clone();
+    public List<K> getKeys() {
+        return new ArrayList<>(this.keys);
     }
 
     /**
@@ -181,7 +161,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @see #getValue(int)
      */
     @Override
-    public Number getValue(Comparable key) {
+    public Number getValue(K key) {
         int index = getIndex(key);
         if (index < 0) {
             throw new UnknownKeyException("Key not found: " + key);
@@ -197,7 +177,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      *
      * @see #addValue(Comparable, Number)
      */
-    public void addValue(Comparable key, double value) {
+    public void addValue(K key, double value) {
         addValue(key, Double.valueOf(value));
     }
 
@@ -209,7 +189,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @param key  the key ({@code null} not permitted).
      * @param value  the value ({@code null} permitted).
      */
-    public void addValue(Comparable key, Number value) {
+    public void addValue(K key, Number value) {
         setValue(key, value);
     }
 
@@ -219,7 +199,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @param key  the key ({@code null} not permitted).
      * @param value  the value.
      */
-    public void setValue(Comparable key, double value) {
+    public void setValue(K key, double value) {
         setValue(key, Double.valueOf(value));
     }
 
@@ -229,7 +209,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      * @param key  the key ({@code null} not permitted).
      * @param value  the value ({@code null} permitted).
      */
-    public void setValue(Comparable key, Number value) {
+    public void setValue(K key, Number value) {
         Args.nullNotPermitted(key, "key");
         int keyIndex = getIndex(key);
         if (keyIndex >= 0) {
@@ -254,7 +234,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      *
      * @since 1.0.6
      */
-    public void insertValue(int position, Comparable key, double value) {
+    public void insertValue(int position, K key, double value) {
         insertValue(position, key, Double.valueOf(value));
     }
 
@@ -269,7 +249,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      *
      * @since 1.0.6
      */
-    public void insertValue(int position, Comparable key, Number value) {
+    public void insertValue(int position, K key, Number value) {
         if (position < 0 || position > getItemCount()) {
             throw new IllegalArgumentException("'position' out of bounds.");
         }
@@ -298,7 +278,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
     private void rebuildIndex () {
         this.indexMap.clear();
         for (int i = 0; i < this.keys.size(); i++) {
-            final Object key = this.keys.get(i);
+            final K key = this.keys.get(i);
             this.indexMap.put(key, i);
         }
     }
@@ -327,7 +307,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      *     {@code null}.
      * @throws UnknownKeyException if {@code key} is not recognised.
      */
-    public void removeValue(Comparable key) {
+    public void removeValue(K key) {
         int index = getIndex(key);
         if (index < 0) {
             throw new UnknownKeyException("The key (" + key
@@ -354,11 +334,10 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
      */
     public void sortByKeys(SortOrder order) {
         final int size = this.keys.size();
-        final DefaultKeyedValue[] data = new DefaultKeyedValue[size];
+        final DefaultKeyedValue<K>[] data = new DefaultKeyedValue[size];
 
         for (int i = 0; i < size; i++) {
-            data[i] = new DefaultKeyedValue((Comparable) this.keys.get(i),
-                    (Number) this.values.get(i));
+            data[i] = new DefaultKeyedValue(this.keys.get(i), this.values.get(i));
         }
 
         Comparator comparator = new KeyedValueComparator(
@@ -367,7 +346,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
         clear();
 
         for (int i = 0; i < data.length; i++) {
-            final DefaultKeyedValue value = data[i];
+            final DefaultKeyedValue<K> value = data[i];
             addValue(value.getKey(), value.getValue());
         }
     }
@@ -393,7 +372,7 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
 
         clear();
         for (int i = 0; i < data.length; i++) {
-            final DefaultKeyedValue value = data[i];
+            final DefaultKeyedValue<K> value = data[i];
             addValue(value.getKey(), value.getValue());
         }
     }
@@ -464,9 +443,9 @@ public class DefaultKeyedValues implements KeyedValues, Cloneable,
     @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultKeyedValues clone = (DefaultKeyedValues) super.clone();
-        clone.keys = (ArrayList) this.keys.clone();
-        clone.values = (ArrayList) this.values.clone();
-        clone.indexMap = (HashMap) this.indexMap.clone();
+        clone.keys = new ArrayList<>(this.keys);
+        clone.values = new ArrayList<>(this.values);
+        clone.indexMap = new HashMap(this.indexMap);
         return clone;
     }
 

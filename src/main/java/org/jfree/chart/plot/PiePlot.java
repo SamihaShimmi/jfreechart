@@ -27,7 +27,7 @@
  * ------------
  * PiePlot.java
  * ------------
- * (C) Copyright 2000-2017, by Andrzej Porebski and Contributors.
+ * (C) Copyright 2000-2020, by Andrzej Porebski and Contributors.
  *
  * Original Author:  Andrzej Porebski;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -38,138 +38,7 @@
  *                   Martin Hilpert (patch 1891849);
  *                   Andreas Schroeder (very minor);
  *                   Christoph Beck (bug 2121818);
- *
- * Changes
- * -------
- * 21-Jun-2001 : Removed redundant JFreeChart parameter from constructors (DG);
- * 18-Sep-2001 : Updated header (DG);
- * 15-Oct-2001 : Data source classes moved to com.jrefinery.data.* (DG);
- * 19-Oct-2001 : Moved series paint and stroke methods from JFreeChart.java to
- *               Plot.java (DG);
- * 22-Oct-2001 : Renamed DataSource.java --> Dataset.java etc. (DG);
- * 13-Nov-2001 : Modified plot subclasses so that null axes are possible for
- *               pie plot (DG);
- * 17-Nov-2001 : Added PieDataset interface and amended this class accordingly,
- *               and completed removal of BlankAxis class as it is no longer
- *               required (DG);
- * 19-Nov-2001 : Changed 'drawCircle' property to 'circular' property (DG);
- * 21-Nov-2001 : Added options for exploding pie sections and filled out range
- *               of properties (DG);
- *               Added option for percentages in chart labels, based on code
- *               by Martin Cordova (DG);
- * 30-Nov-2001 : Changed default font from "Arial" --> "SansSerif" (DG);
- * 12-Dec-2001 : Removed unnecessary 'throws' clause in constructor (DG);
- * 13-Dec-2001 : Added tooltips (DG);
- * 16-Jan-2002 : Renamed tooltips class (DG);
- * 22-Jan-2002 : Fixed bug correlating legend labels with pie data (DG);
- * 05-Feb-2002 : Added alpha-transparency to plot class, and updated
- *               constructors accordingly (DG);
- * 06-Feb-2002 : Added optional background image and alpha-transparency to Plot
- *               and subclasses.  Clipped drawing within plot area (DG);
- * 26-Mar-2002 : Added an empty zoom method (DG);
- * 18-Apr-2002 : PieDataset is no longer sorted (oldman);
- * 23-Apr-2002 : Moved dataset from JFreeChart to Plot.  Added
- *               getLegendItemLabels() method (DG);
- * 19-Jun-2002 : Added attributes to control starting angle and direction
- *               (default is now clockwise) (DG);
- * 25-Jun-2002 : Removed redundant imports (DG);
- * 02-Jul-2002 : Fixed sign of percentage bug introduced in 0.9.2 (DG);
- * 16-Jul-2002 : Added check for null dataset in getLegendItemLabels() (DG);
- * 30-Jul-2002 : Moved summation code to DatasetUtilities (DG);
- * 05-Aug-2002 : Added URL support for image maps - new member variable for
- *               urlGenerator, modified constructor and minor change to the
- *               draw method (RA);
- * 18-Sep-2002 : Modified the percent label creation and added setters for the
- *               formatters (AS);
- * 24-Sep-2002 : Added getLegendItems() method (DG);
- * 02-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- * 09-Oct-2002 : Added check for null entity collection (DG);
- * 30-Oct-2002 : Changed PieDataset interface (DG);
- * 18-Nov-2002 : Changed CategoryDataset to TableDataset (DG);
- * 02-Jan-2003 : Fixed "no data" message (DG);
- * 23-Jan-2003 : Modified to extract data from rows OR columns in
- *               CategoryDataset (DG);
- * 14-Feb-2003 : Fixed label drawing so that foreground alpha does not apply
- *               (bug id 685536) (DG);
- * 07-Mar-2003 : Modified to pass pieIndex on to PieSectionEntity and tooltip
- *               and URL generators (DG);
- * 21-Mar-2003 : Added a minimum angle for drawing arcs
- *               (see bug id 620031) (DG);
- * 24-Apr-2003 : Switched around PieDataset and KeyedValuesDataset (DG);
- * 02-Jun-2003 : Fixed bug 721733 (DG);
- * 30-Jul-2003 : Modified entity constructor (CZ);
- * 19-Aug-2003 : Implemented Cloneable (DG);
- * 29-Aug-2003 : Fixed bug 796936 (null pointer on setOutlinePaint()) (DG);
- * 08-Sep-2003 : Added internationalization via use of properties
- *               resourceBundle (RFE 690236) (AL);
- * 16-Sep-2003 : Changed ChartRenderingInfo --> PlotRenderingInfo (DG);
- * 29-Oct-2003 : Added workaround for font alignment in PDF output (DG);
- * 05-Nov-2003 : Fixed missing legend bug (DG);
- * 10-Nov-2003 : Re-added the DatasetChangeListener to constructors (CZ);
- * 29-Jan-2004 : Fixed clipping bug in draw() method (DG);
- * 11-Mar-2004 : Major overhaul to improve labelling (DG);
- * 31-Mar-2004 : Made an adjustment for the plot area when the label generator
- *               is null.  Fixed null pointer exception when the label
- *               generator returns null for a label (DG);
- * 06-Apr-2004 : Added getter, setter, serialization and draw support for
- *               labelBackgroundPaint (AS);
- * 08-Apr-2004 : Added flag to control whether null values are ignored or
- *               not (DG);
- * 15-Apr-2004 : Fixed some minor warnings from Eclipse (DG);
- * 26-Apr-2004 : Added attributes for label outline and shadow (DG);
- * 04-Oct-2004 : Renamed ShapeUtils --> ShapeUtilities (DG);
- * 04-Nov-2004 : Fixed null pointer exception with new LegendTitle class (DG);
- * 09-Nov-2004 : Added user definable legend item shape (DG);
- * 25-Nov-2004 : Added new legend label generator (DG);
- * 20-Apr-2005 : Added a tool tip generator for legend labels (DG);
- * 26-Apr-2005 : Removed LOGGER (DG);
- * 05-May-2005 : Updated draw() method parameters (DG);
- * 10-May-2005 : Added flag to control visibility of label linking lines, plus
- *               another flag to control the handling of zero values (DG);
- * 08-Jun-2005 : Fixed bug in getLegendItems() method (not respecting flags
- *               for ignoring null and zero values), and fixed equals() method
- *               to handle GradientPaint (DG);
- * 15-Jul-2005 : Added sectionOutlinesVisible attribute (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
- * 09-Jan-2006 : Fixed bug 1400442, inconsistent treatment of null and zero
- *               values in dataset (DG);
- * 28-Feb-2006 : Fixed bug 1440415, bad distribution of pie section
- *               labels (DG);
- * 27-Sep-2006 : Initialised baseSectionPaint correctly, added lookup methods
- *               for section paint, outline paint and outline stroke (DG);
- * 27-Sep-2006 : Refactored paint and stroke methods to use keys rather than
- *               section indices (DG);
- * 03-Oct-2006 : Replaced call to JRE 1.5 method (DG);
- * 23-Nov-2006 : Added support for URLs for the legend items (DG);
- * 24-Nov-2006 : Cloning fixes (DG);
- * 17-Apr-2007 : Check for null label in legend items (DG);
- * 19-Apr-2007 : Deprecated override settings (DG);
- * 18-May-2007 : Set dataset for LegendItem (DG);
- * 14-Jun-2007 : Added label distributor attribute (DG);
- * 18-Jul-2007 : Added simple label option (DG);
- * 21-Nov-2007 : Fixed labelling bugs, added debug code, restored default
- *               white background (DG);
- * 19-Mar-2008 : Fixed IllegalArgumentException when drawing with null
- *               dataset (DG);
- * 31-Mar-2008 : Adjust the label area for the interiorGap (DG);
- * 31-Mar-2008 : Added quad and cubic curve label link lines - see patch
- *               1891849 by Martin Hilpert (DG);
- * 02-Jul-2008 : Added autoPopulate flags (DG);
- * 15-Aug-2008 : Added methods to clear section attributes (DG);
- * 15-Aug-2008 : Fixed bug 2051168 - problem with LegendItemEntity
- *               generation (DG);
- * 23-Sep-2008 : Added getLabelLinkDepth() method - see bug 2121818 reported
- *               by Christoph Beck (DG);
- * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
- *               Jess Thrysoee (DG);
- * 10-Jul-2009 : Added optional drop shadow generator (DG);
- * 03-Sep-2009 : Fixed bug where sinmpleLabelOffset is ignored (DG);
- * 04-Nov-2009 : Add mouse wheel rotation support (DG);
- * 18-Oct-2011 : Fixed tooltip offset with shadow generator (DG);
- * 20-Nov-2011 : Initialise shadow generator as null (DG);
- * 01-Jul-2012 : General label once only in drawSimpleLabels() (DG);
- * 02-Jul-2013 : Use ParamChecks (DG);
- * 12-Sep-2013 : Check for KEY_SUPPRESS_SHADOW_GENERATION rendering hint (DG);
+ *                   Tracy Hiltbrand (Added generics for bug fix);
  * 
  */
 
@@ -198,9 +67,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import org.jfree.chart.JFreeChart;
@@ -245,7 +114,7 @@ import org.jfree.data.general.PieDataset;
  * The example shown here is generated by the {@code PieChartDemo2.java}
  * program included in the JFreeChart Demo Collection:
  * <br><br>
- * <img src="../../../../images/PiePlotSample.png" alt="PiePlotSample.png">
+ * <img src="doc-files/PieChartDemo2.svg" alt="PieChartDemo2.svg">
  * <P>
  * Special notes:
  * <ol>
@@ -256,10 +125,12 @@ import org.jfree.data.general.PieDataset;
  * {@link org.jfree.data.category.CategoryDataset};</li>
  * </ol>
  *
+ * @param <K> Key type for PieDataset
+ * 
  * @see Plot
  * @see PieDataset
  */
-public class PiePlot extends Plot implements Cloneable, Serializable {
+public class PiePlot<K extends Comparable<K>> extends Plot implements Cloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -795612466005590431L;
@@ -299,7 +170,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
     public static final double DEFAULT_MINIMUM_ARC_ANGLE_TO_DRAW = 0.00001;
 
     /** The dataset for the pie chart. */
-    private PieDataset dataset;
+    private PieDataset<K> dataset;
 
     /** The pie index (used by the {@link MultiplePiePlot} class). */
     private int pieIndex;
@@ -377,7 +248,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
     private double shadowYOffset = 4.0f;
 
     /** The percentage amount to explode each pie section. */
-    private Map<Comparable, Double> explodePercentages;
+    private Map<K, Double> explodePercentages;
 
     /** The section label generator. */
     private PieSectionLabelGenerator labelGenerator;
@@ -558,7 +429,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @param dataset  the dataset ({@code null} permitted).
      */
-    public PiePlot(PieDataset dataset) {
+    public PiePlot(PieDataset<K> dataset) {
         super();
         this.dataset = dataset;
         if (dataset != null) {
@@ -585,7 +456,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
         this.defaultSectionOutlineStroke = DEFAULT_OUTLINE_STROKE;
         this.autoPopulateSectionOutlineStroke = false;
 
-        this.explodePercentages = new TreeMap();
+        this.explodePercentages = new TreeMap<>();
 
         this.labelGenerator = new StandardPieSectionLabelGenerator();
         this.labelFont = DEFAULT_LABEL_FONT;
@@ -622,7 +493,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @see #setDataset(PieDataset)
      */
-    public PieDataset getDataset() {
+    public PieDataset<K> getDataset() {
         return this.dataset;
     }
 
@@ -633,10 +504,10 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @see #getDataset()
      */
-    public void setDataset(PieDataset dataset) {
+    public void setDataset(PieDataset<K> dataset) {
         // if there is an existing dataset, remove the plot from the list of
         // change listeners...
-        PieDataset existing = this.dataset;
+        PieDataset<K> existing = this.dataset;
         if (existing != null) {
             existing.removeChangeListener(this);
         }
@@ -928,12 +799,9 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
     }
 
     /**
-     * Returns a key for the specified section.  If there is no such section
-     * in the dataset, we generate a key.  This is to provide some backward
-     * compatibility for the (now deprecated) methods that get/set attributes
-     * based on section indices.  The preferred way of doing this now is to
-     * link the attributes directly to the section key (there are new methods
-     * for this, starting from version 1.0.3).
+     * Returns a key for the specified section. The preferred way of doing this
+     * now is to link the attributes directly to the section key (there are new
+     * methods for this, starting from version 1.0.3).
      *
      * @param section  the section index.
      *
@@ -941,15 +809,12 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @since 1.0.3
      */
-    protected Comparable getSectionKey(int section) {
-        Comparable key = null;
+    protected K getSectionKey(int section) {
+        K key = null;
         if (this.dataset != null) {
             if (section >= 0 && section < this.dataset.getItemCount()) {
                 key = this.dataset.getKey(section);
             }
-        }
-        if (key == null) {
-            key = section;
         }
         return key;
     }
@@ -1539,7 +1404,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @see #setExplodePercent(Comparable, double)
      */
-    public double getExplodePercent(Comparable key) {
+    public double getExplodePercent(K key) {
         double result = 0.0;
         if (this.explodePercentages != null) {
             Number percent = (Number) this.explodePercentages.get(key);
@@ -1561,10 +1426,10 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @see #getExplodePercent(Comparable)
      */
-    public void setExplodePercent(Comparable key, double percent) {
+    public void setExplodePercent(K key, double percent) {
         Args.nullNotPermitted(key, "key");
         if (this.explodePercentages == null) {
-            this.explodePercentages = new TreeMap();
+            this.explodePercentages = new TreeMap<>();
         }
         this.explodePercentages.put(key, percent);
         fireChangeEvent();
@@ -1580,12 +1445,10 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
             return 0.0;
         }
         double result = 0.0;
-        Iterator iterator = this.dataset.getKeys().iterator();
-        while (iterator.hasNext()) {
-            Comparable key = (Comparable) iterator.next();
-            Number explode = (Number) this.explodePercentages.get(key);
+        for (K key : this.dataset.getKeys()) {
+            Double explode = this.explodePercentages.get(key);
             if (explode != null) {
-                result = Math.max(result, explode.doubleValue());
+                result = Math.max(result, explode);
             }
         }
         return result;
@@ -2313,7 +2176,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *         chart drawing).
      */
     public PiePlotState initialise(Graphics2D g2, Rectangle2D plotArea,
-            PiePlot plot, Integer index, PlotRenderingInfo info) {
+            PiePlot<?> plot, Integer index, PlotRenderingInfo info) {
 
         PiePlotState state = new PiePlotState(info);
         state.setPassesRequired(2);
@@ -2497,7 +2360,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
         // plot the data (unless the dataset is null)...
         if ((this.dataset != null) && (this.dataset.getKeys().size() > 0)) {
 
-            List keys = this.dataset.getKeys();
+            List<K> keys = this.dataset.getKeys();
             double totalValue = DatasetUtils.calculatePieDatasetTotal(
                     this.dataset);
 
@@ -2583,7 +2446,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
                 }
             }
             else if (currentPass == 1) {
-                Comparable key = getSectionKey(section);
+                K key = getSectionKey(section);
                 Paint paint = lookupSectionPaint(key, state);
                 g2.setPaint(paint);
                 g2.fill(arc);
@@ -2634,7 +2497,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @since 1.0.7
      */
-    protected void drawSimpleLabels(Graphics2D g2, List keys,
+    protected void drawSimpleLabels(Graphics2D g2, List<K> keys,
             double totalValue, Rectangle2D plotArea, Rectangle2D pieArea,
             PiePlotState state) {
 
@@ -2645,9 +2508,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
         Rectangle2D labelsArea = this.simpleLabelOffset.createInsetRectangle(
                 pieArea);
         double runningTotal = 0.0;
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            Comparable key = (Comparable) iterator.next();
+        for (K key : keys) {
             boolean include;
             double v = 0.0;
             Number n = getDataset().getValue(key);
@@ -2727,7 +2588,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      * @param linkArea  the link area.
      * @param state  the state.
      */
-    protected void drawLabels(Graphics2D g2, List keys, double totalValue,
+    protected void drawLabels(Graphics2D g2, List<K> keys, double totalValue,
                               Rectangle2D plotArea, Rectangle2D linkArea,
                               PiePlotState state) {
 
@@ -2740,9 +2601,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
         DefaultKeyedValues rightKeys = new DefaultKeyedValues();
 
         double runningTotal = 0.0;
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            Comparable key = (Comparable) iterator.next();
+        for (K key : keys) {
             boolean include;
             double v = 0.0;
             Number n = this.dataset.getValue(key);
@@ -2801,7 +2660,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      * @param maxLabelWidth  the maximum label width.
      * @param state  the state.
      */
-    protected void drawLeftLabels(KeyedValues leftKeys, Graphics2D g2,
+    protected void drawLeftLabels(KeyedValues<K> leftKeys, Graphics2D g2,
                                   Rectangle2D plotArea, Rectangle2D linkArea,
                                   float maxLabelWidth, PiePlotState state) {
 
@@ -2859,7 +2718,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      * @param maxLabelWidth  the maximum label width.
      * @param state  the state.
      */
-    protected void drawRightLabels(KeyedValues keys, Graphics2D g2,
+    protected void drawRightLabels(KeyedValues<K> keys, Graphics2D g2,
                                    Rectangle2D plotArea, Rectangle2D linkArea,
                                    float maxLabelWidth, PiePlotState state) {
 
@@ -2921,12 +2780,10 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
         if (this.dataset == null) {
             return result;
         }
-        List keys = this.dataset.getKeys();
+        List<K> keys = this.dataset.getKeys();
         int section = 0;
         Shape shape = getLegendItemShape();
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            Comparable key = (Comparable) iterator.next();
+        for (K key : keys) {
             Number n = this.dataset.getValue(key);
             boolean include;
             if (n == null) {
@@ -3138,7 +2995,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @since 1.0.14
      */
-    protected Point2D getArcCenter(PiePlotState state, Comparable key) {
+    protected Point2D getArcCenter(PiePlotState state, K key) {
         Point2D center = new Point2D.Double(state.getPieCenterX(), state
             .getPieCenterY());
 
@@ -3194,7 +3051,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      *
      * @since 1.0.14
      */
-    protected Paint lookupSectionPaint(Comparable key, PiePlotState state) {
+    protected Paint lookupSectionPaint(K key, PiePlotState state) {
         Paint paint = lookupSectionPaint(key, getAutoPopulateSectionPaint());
         // for a RadialGradientPaint we adjust the center and radius to match
         // the current pie segment...
@@ -3214,7 +3071,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
      * Tests this plot for equality with an arbitrary object.  Note that the
      * plot's dataset is NOT included in the test for equality.
      *
-     * @param obj  the object to test against ({@code null} permitted).
+     * @param obj the object to test against ({@code null} permitted).
      *
      * @return {@code true} or {@code false}.
      */
@@ -3393,6 +3250,64 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
     }
 
     /**
+     * Generates a hashcode.  Note that, as with the equals method, the dataset
+     * is NOT included in the hashcode.
+     * 
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + this.pieIndex;
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.interiorGap) ^ (Double.doubleToLongBits(this.interiorGap) >>> 32));
+        hash = 73 * hash + (this.circular ? 1 : 0);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.startAngle) ^ (Double.doubleToLongBits(this.startAngle) >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.direction);
+        hash = 73 * hash + Objects.hashCode(this.sectionPaintMap);
+        hash = 73 * hash + Objects.hashCode(this.defaultSectionPaint);
+        hash = 73 * hash + (this.autoPopulateSectionPaint ? 1 : 0);
+        hash = 73 * hash + (this.sectionOutlinesVisible ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.sectionOutlinePaintMap);
+        hash = 73 * hash + Objects.hashCode(this.defaultSectionOutlinePaint);
+        hash = 73 * hash + (this.autoPopulateSectionOutlinePaint ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.sectionOutlineStrokeMap);
+        hash = 73 * hash + Objects.hashCode(this.defaultSectionOutlineStroke);
+        hash = 73 * hash + (this.autoPopulateSectionOutlineStroke ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.shadowPaint);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.shadowXOffset) ^ (Double.doubleToLongBits(this.shadowXOffset) >>> 32));
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.shadowYOffset) ^ (Double.doubleToLongBits(this.shadowYOffset) >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.explodePercentages);
+        hash = 73 * hash + Objects.hashCode(this.labelGenerator);
+        hash = 73 * hash + Objects.hashCode(this.labelFont);
+        hash = 73 * hash + Objects.hashCode(this.labelPaint);
+        hash = 73 * hash + Objects.hashCode(this.labelBackgroundPaint);
+        hash = 73 * hash + Objects.hashCode(this.labelOutlinePaint);
+        hash = 73 * hash + Objects.hashCode(this.labelOutlineStroke);
+        hash = 73 * hash + Objects.hashCode(this.labelShadowPaint);
+        hash = 73 * hash + (this.simpleLabels ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.labelPadding);
+        hash = 73 * hash + Objects.hashCode(this.simpleLabelOffset);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.maximumLabelWidth) ^ (Double.doubleToLongBits(this.maximumLabelWidth) >>> 32));
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.labelGap) ^ (Double.doubleToLongBits(this.labelGap) >>> 32));
+        hash = 73 * hash + (this.labelLinksVisible ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.labelLinkStyle);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.labelLinkMargin) ^ (Double.doubleToLongBits(this.labelLinkMargin) >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.labelLinkPaint);
+        hash = 73 * hash + Objects.hashCode(this.labelLinkStroke);
+        hash = 73 * hash + Objects.hashCode(this.toolTipGenerator);
+        hash = 73 * hash + Objects.hashCode(this.urlGenerator);
+        hash = 73 * hash + Objects.hashCode(this.legendLabelGenerator);
+        hash = 73 * hash + Objects.hashCode(this.legendLabelToolTipGenerator);
+        hash = 73 * hash + Objects.hashCode(this.legendLabelURLGenerator);
+        hash = 73 * hash + (this.ignoreNullValues ? 1 : 0);
+        hash = 73 * hash + (this.ignoreZeroValues ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.legendItemShape);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.minimumArcAngleToDraw) ^ (Double.doubleToLongBits(this.minimumArcAngleToDraw) >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.shadowGenerator);
+        return hash;
+    }
+
+    /**
      * Returns a clone of the plot.
      *
      * @return A clone.
@@ -3408,8 +3323,7 @@ public class PiePlot extends Plot implements Cloneable, Serializable {
                 = (PaintMap) this.sectionOutlinePaintMap.clone();
         clone.sectionOutlineStrokeMap 
                 = (StrokeMap) this.sectionOutlineStrokeMap.clone();
-        clone.explodePercentages 
-                = new TreeMap<Comparable, Double>(this.explodePercentages);
+        clone.explodePercentages = new TreeMap<>(this.explodePercentages);
         if (this.labelGenerator != null) {
             clone.labelGenerator = (PieSectionLabelGenerator) 
                     ObjectUtils.clone(this.labelGenerator);

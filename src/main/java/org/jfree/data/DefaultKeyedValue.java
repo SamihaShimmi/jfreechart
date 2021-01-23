@@ -27,44 +27,34 @@
  * ----------------------
  * DefaultKeyedValue.java
  * ----------------------
- * (C) Copyright 2002-2016, by Object Refinery Limited.
+ * (C) Copyright 2002-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 31-Oct-2002 : Version 1 (DG);
- * 13-Mar-2003 : Added equals() method, and implemented Serializable (DG);
- * 18-Aug-2003 : Implemented Cloneable (DG);
- * 18-Aug-2004 : Moved from org.jfree.data --> org.jfree.data.base (DG);
- * 15-Sep-2004 : Added PublicCloneable interface (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
- * 11-Jun-2007 : Added toString() method to help with debugging (DG);
- * 15-Feb-2008 : Prevent null key (DG);
- * 07-Apr-2008 : Removed to-do item (DG);
- * 03-Jul-2013 : Use ParamChecks (DG);
+ * Contributor(s):   Tracy Hiltbrand (generics for bug fix to PiePlot);
  *
  */
 
 package org.jfree.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
- * A (key, value) pair.  This class provides a default implementation
- * of the {@link KeyedValue} interface.
+ * A (key, value) pair. This class provides a default implementation of the 
+ * {@link KeyedValue} interface.
+ * 
+ * @param <K> the key type ({@code String} is a good default).
  */
-public class DefaultKeyedValue implements KeyedValue, Cloneable,
-        PublicCloneable, Serializable {
+public class DefaultKeyedValue<K extends Comparable<K>> 
+        implements KeyedValue<K>, Cloneable, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -7388924517460437712L;
 
     /** The key. */
-    private Comparable key;
+    private final K key;
 
     /** The value. */
     private Number value;
@@ -72,11 +62,10 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Creates a new (key, value) item.
      *
-     * @param key  the key (should be immutable, {@code null} not
-     *         permitted).
+     * @param key  the key (should be immutable, {@code null} not permitted).
      * @param value  the value ({@code null} permitted).
      */
-    public DefaultKeyedValue(Comparable key, Number value) {
+    public DefaultKeyedValue(K key, Number value) {
         Args.nullNotPermitted(key, "key");
         this.key = key;
         this.value = value;
@@ -88,7 +77,7 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
      * @return The key (never {@code null}).
      */
     @Override
-    public Comparable getKey() {
+    public K getKey() {
         return this.key;
     }
 
@@ -126,16 +115,11 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
         if (!(obj instanceof DefaultKeyedValue)) {
             return false;
         }
-        DefaultKeyedValue that = (DefaultKeyedValue) obj;
-
+        DefaultKeyedValue<K> that = (DefaultKeyedValue) obj;
         if (!this.key.equals(that.key)) {
             return false;
         }
-        if (this.value != null
-                ? !this.value.equals(that.value) : that.value != null) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.value, that.value);
     }
 
     /**

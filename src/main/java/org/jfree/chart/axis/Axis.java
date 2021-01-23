@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2020, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -27,65 +27,13 @@
  * ---------
  * Axis.java
  * ---------
- * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2020, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Bill Kelemen;
  *                   Nicolas Brodu;
  *                   Peter Kolb (patches 1934255 and 2603321);
- *                   Andrew Mickish (patch 1870189);
- *
- * Changes
- * -------
- * 21-Aug-2001 : Added standard header, fixed DOS encoding problem (DG);
- * 18-Sep-2001 : Updated header (DG);
- * 07-Nov-2001 : Allow null axis labels (DG);
- *             : Added default font values (DG);
- * 13-Nov-2001 : Modified the setPlot() method to check compatibility between
- *               the axis and the plot (DG);
- * 30-Nov-2001 : Changed default font from "Arial" --> "SansSerif" (DG);
- * 06-Dec-2001 : Allow null in setPlot() method (BK);
- * 06-Mar-2002 : Added AxisConstants interface (DG);
- * 23-Apr-2002 : Added a visible property.  Moved drawVerticalString to
- *               RefineryUtilities.  Added fixedDimension property for use in
- *               combined plots (DG);
- * 25-Jun-2002 : Removed unnecessary imports (DG);
- * 05-Sep-2002 : Added attribute for tick mark paint (DG);
- * 18-Sep-2002 : Fixed errors reported by Checkstyle (DG);
- * 07-Nov-2002 : Added attributes to control the inside and outside length of
- *               the tick marks (DG);
- * 08-Nov-2002 : Moved to new package com.jrefinery.chart.axis (DG);
- * 18-Nov-2002 : Added axis location to refreshTicks() parameters (DG);
- * 15-Jan-2003 : Removed monolithic constructor (DG);
- * 17-Jan-2003 : Moved plot classes to separate package (DG);
- * 26-Mar-2003 : Implemented Serializable (DG);
- * 03-Jul-2003 : Modified reserveSpace method (DG);
- * 13-Aug-2003 : Implemented Cloneable (DG);
- * 11-Sep-2003 : Took care of listeners while cloning (NB);
- * 29-Oct-2003 : Added workaround for font alignment in PDF output (DG);
- * 06-Nov-2003 : Modified refreshTicks() signature (DG);
- * 06-Jan-2004 : Added axis line attributes (DG);
- * 16-Mar-2004 : Added plot state to draw() method (DG);
- * 07-Apr-2004 : Modified text bounds calculation (DG);
- * 18-May-2004 : Eliminated AxisConstants.java (DG);
- * 30-Sep-2004 : Moved drawRotatedString() from RefineryUtilities -->
- *               TextUtilities (DG);
- * 04-Oct-2004 : Modified getLabelEnclosure() method to treat an empty String
- *               the same way as a null string - see bug 1026521 (DG);
- * 21-Apr-2005 : Replaced Insets with RectangleInsets (DG);
- * 26-Apr-2005 : Removed LOGGER (DG);
- * 01-Jun-2005 : Added hasListener() method for unit testing (DG);
- * 08-Jun-2005 : Fixed equals() method to handle GradientPaint (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
- * 22-Aug-2006 : API doc updates (DG);
- * 06-Jun-2008 : Added setTickLabelInsets(RectangleInsets, boolean) (DG);
- * 25-Sep-2008 : Added minor tick support, see patch 1934255 by Peter Kolb (DG);
- * 26-Sep-2008 : Added fireChangeEvent() method (DG);
- * 19-Mar-2009 : Added entity support - see patch 2603321 by Peter Kolb (DG);
- * 02-Jul-2013 : Use ParamChecks (DG);
- * 01-Aug-2013 : Added attributedLabel override to support superscripts,
- *               subscripts and more (DG);
- * 29-Jul-2014 : Add hint to normalise stroke for axis line (DG);
+ *                   Andrew Mickish (patch 1870189); 
  *
  */
 
@@ -112,6 +60,7 @@ import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.EventListener;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.event.EventListenerList;
 
@@ -127,7 +76,6 @@ import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.chart.util.AttrStringUtils;
-import org.jfree.chart.util.ObjectUtils;
 import org.jfree.chart.util.PaintUtils;
 import org.jfree.chart.util.Args;
 import org.jfree.chart.util.SerialUtils;
@@ -142,53 +90,53 @@ public abstract class Axis implements Cloneable, Serializable {
     /** For serialization. */
     private static final long serialVersionUID = 7719289504573298271L;
 
-    /** The default axis visibility. */
+    /** The default axis visibility ({@code true}). */
     public static final boolean DEFAULT_AXIS_VISIBLE = true;
 
-    /** The default axis label font. */
+    /** The default axis label font ({@code Font("SansSerif", Font.PLAIN, 12)}). */
     public static final Font DEFAULT_AXIS_LABEL_FONT = new Font(
             "SansSerif", Font.PLAIN, 12);
 
-    /** The default axis label paint. */
+    /** The default axis label paint ({@code Color.BLACK}). */
     public static final Paint DEFAULT_AXIS_LABEL_PAINT = Color.BLACK;
 
-    /** The default axis label insets. */
+    /** The default axis label insets ({@code RectangleInsets(3.0, 3.0, 3.0, 3.0)}). */
     public static final RectangleInsets DEFAULT_AXIS_LABEL_INSETS
             = new RectangleInsets(3.0, 3.0, 3.0, 3.0);
 
-    /** The default axis line paint. */
+    /** The default axis line paint ({@code Color.GRAY}). */
     public static final Paint DEFAULT_AXIS_LINE_PAINT = Color.GRAY;
 
-    /** The default axis line stroke. */
+    /** The default axis line stroke ({@code BasicStroke(0.5f)}). */
     public static final Stroke DEFAULT_AXIS_LINE_STROKE = new BasicStroke(0.5f);
 
-    /** The default tick labels visibility. */
+    /** The default tick labels visibility ({@code true}). */
     public static final boolean DEFAULT_TICK_LABELS_VISIBLE = true;
 
-    /** The default tick label font. */
+    /** The default tick label font ({@code Font("SansSerif", Font.PLAIN, 10)}). */
     public static final Font DEFAULT_TICK_LABEL_FONT = new Font("SansSerif",
             Font.PLAIN, 10);
 
-    /** The default tick label paint. */
+    /** The default tick label paint ({@code Color.BLACK}). */
     public static final Paint DEFAULT_TICK_LABEL_PAINT = Color.BLACK;
 
-    /** The default tick label insets. */
+    /** The default tick label insets ({@code RectangleInsets(2.0, 4.0, 2.0, 4.0)}). */
     public static final RectangleInsets DEFAULT_TICK_LABEL_INSETS
             = new RectangleInsets(2.0, 4.0, 2.0, 4.0);
 
-    /** The default tick marks visible. */
+    /** The default tick marks visible ({@code true}). */
     public static final boolean DEFAULT_TICK_MARKS_VISIBLE = true;
 
-    /** The default tick stroke. */
+    /** The default tick stroke ({@code BasicStroke(0.5f)}). */
     public static final Stroke DEFAULT_TICK_MARK_STROKE = new BasicStroke(0.5f);
 
-    /** The default tick paint. */
+    /** The default tick paint ({@code Color.GRAY}). */
     public static final Paint DEFAULT_TICK_MARK_PAINT = Color.GRAY;
 
-    /** The default tick mark inside length. */
+    /** The default tick mark inside length ({@code 0.0f}). */
     public static final float DEFAULT_TICK_MARK_INSIDE_LENGTH = 0.0f;
 
-    /** The default tick mark outside length. */
+    /** The default tick mark outside length ({@code 2.0f}). */
     public static final float DEFAULT_TICK_MARK_OUTSIDE_LENGTH = 2.0f;
 
     /** A flag indicating whether or not the axis is visible. */
@@ -301,7 +249,8 @@ public abstract class Axis implements Cloneable, Serializable {
     private transient EventListenerList listenerList;
 
     /**
-     * Constructs an axis, using default values where necessary.
+     * Constructs an axis with the specific label and default values for other
+     * attributes.  
      *
      * @param label  the axis label ({@code null} permitted).
      */
@@ -1128,15 +1077,18 @@ public abstract class Axis implements Cloneable, Serializable {
             Rectangle2D dataArea, RectangleEdge edge);
 
     /**
-     * Created an entity for the axis.
-     *
+     * Creates an entity for the axis and adds it to the rendering info.
+     * If {@code plotState} is {@code null}, this means that rendering info
+     * is not being collected so this method simply returns without doing 
+     * anything.
+     * 
      * @param cursor  the initial cursor value.
      * @param state  the axis state after completion of the drawing with a
      *     possibly updated cursor position.
      * @param dataArea  the data area.
-     * @param edge  the edge.
+     * @param edge  the edge ({@code null} not permitted).
      * @param plotState  the PlotRenderingInfo from which a reference to the
-     *     entity collection can be obtained.
+     *     entity collection can be obtained ({@code null} permitted).
      *
      * @since 1.0.13
      */
@@ -1144,6 +1096,7 @@ public abstract class Axis implements Cloneable, Serializable {
             Rectangle2D dataArea, RectangleEdge edge,
             PlotRenderingInfo plotState) {
 
+        Args.nullNotPermitted(edge, "edge");
         if (plotState == null || plotState.getOwner() == null) {
             return;  // no need to create entity if we can't save it anyways...
         }
@@ -1273,6 +1226,15 @@ public abstract class Axis implements Cloneable, Serializable {
         return result;
     }
 
+    /**
+     * Returns the x-coordinate for the point to which the axis label should 
+     * be aligned.
+     * 
+     * @param location  the axis label location ({@code null} not permitted).
+     * @param dataArea  the display area in which the data will be rendered ({@code null} not permitted).
+     * 
+     * @return The x-coordinate. 
+     */
     protected double labelLocationX(AxisLabelLocation location, 
             Rectangle2D dataArea) {
         if (location.equals(AxisLabelLocation.HIGH_END)) {
@@ -1287,6 +1249,15 @@ public abstract class Axis implements Cloneable, Serializable {
         throw new RuntimeException("Unexpected AxisLabelLocation: " + location);
     }
     
+    /**
+     * Returns the y-coordinate for the point to which the axis label should
+     * be aligned.
+     * 
+     * @param location  the location ({@code null} not permitted).
+     * @param dataArea  the data area ({@code null} not permitted).
+     * 
+     * @return The y-coordinate. 
+     */
     protected double labelLocationY(AxisLabelLocation location, 
             Rectangle2D dataArea) {
         if (location.equals(AxisLabelLocation.HIGH_END)) {
@@ -1301,6 +1272,14 @@ public abstract class Axis implements Cloneable, Serializable {
         throw new RuntimeException("Unexpected AxisLabelLocation: " + location);
     }
     
+    /**
+     * Returns the appropriate horizontal text anchor for the specified axis 
+     * location.
+     * 
+     * @param location  the location ({@code null} not permitted).
+     * 
+     * @return The text anchor (never {@code null}). 
+     */
     protected TextAnchor labelAnchorH(AxisLabelLocation location) {
         if (location.equals(AxisLabelLocation.HIGH_END)) {
             return TextAnchor.CENTER_RIGHT;
@@ -1314,6 +1293,14 @@ public abstract class Axis implements Cloneable, Serializable {
         throw new RuntimeException("Unexpected AxisLabelLocation: " + location);
     }
     
+    /**
+     * Returns the appropriate vertical text anchor for the specified axis 
+     * location.
+     * 
+     * @param location  the location ({@code null} not permitted).
+     * 
+     * @return The text anchor (never {@code null}). 
+     */
     protected TextAnchor labelAnchorV(AxisLabelLocation location) {
         if (location.equals(AxisLabelLocation.HIGH_END)) {
             return TextAnchor.CENTER_RIGHT;
@@ -1588,20 +1575,20 @@ public abstract class Axis implements Cloneable, Serializable {
         if (this.visible != that.visible) {
             return false;
         }
-        if (!ObjectUtils.equal(this.label, that.label)) {
+        if (!Objects.equals(this.label, that.label)) {
             return false;
         }
         if (!AttributedStringUtils.equal(this.attributedLabel, 
                 that.attributedLabel)) {
             return false;
         }
-        if (!ObjectUtils.equal(this.labelFont, that.labelFont)) {
+        if (!Objects.equals(this.labelFont, that.labelFont)) {
             return false;
         }
         if (!PaintUtils.equal(this.labelPaint, that.labelPaint)) {
             return false;
         }
-        if (!ObjectUtils.equal(this.labelInsets, that.labelInsets)) {
+        if (!Objects.equals(this.labelInsets, that.labelInsets)) {
             return false;
         }
         if (this.labelAngle != that.labelAngle) {
@@ -1613,7 +1600,7 @@ public abstract class Axis implements Cloneable, Serializable {
         if (this.axisLineVisible != that.axisLineVisible) {
             return false;
         }
-        if (!ObjectUtils.equal(this.axisLineStroke, that.axisLineStroke)) {
+        if (!Objects.equals(this.axisLineStroke, that.axisLineStroke)) {
             return false;
         }
         if (!PaintUtils.equal(this.axisLinePaint, that.axisLinePaint)) {
@@ -1622,15 +1609,13 @@ public abstract class Axis implements Cloneable, Serializable {
         if (this.tickLabelsVisible != that.tickLabelsVisible) {
             return false;
         }
-        if (!ObjectUtils.equal(this.tickLabelFont, that.tickLabelFont)) {
+        if (!Objects.equals(this.tickLabelFont, that.tickLabelFont)) {
             return false;
         }
         if (!PaintUtils.equal(this.tickLabelPaint, that.tickLabelPaint)) {
             return false;
         }
-        if (!ObjectUtils.equal(
-            this.tickLabelInsets, that.tickLabelInsets
-        )) {
+        if (!Objects.equals(this.tickLabelInsets, that.tickLabelInsets)) {
             return false;
         }
         if (this.tickMarksVisible != that.tickMarksVisible) {
@@ -1645,7 +1630,7 @@ public abstract class Axis implements Cloneable, Serializable {
         if (!PaintUtils.equal(this.tickMarkPaint, that.tickMarkPaint)) {
             return false;
         }
-        if (!ObjectUtils.equal(this.tickMarkStroke, that.tickMarkStroke)) {
+        if (!Objects.equals(this.tickMarkStroke, that.tickMarkStroke)) {
             return false;
         }
         if (this.minorTickMarksVisible != that.minorTickMarksVisible) {

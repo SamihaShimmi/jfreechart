@@ -27,7 +27,7 @@
  * ---------------
  * ChartPanel.java
  * ---------------
- * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2020, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Andrzej Porebski;
@@ -289,10 +289,10 @@ public class ChartPanel extends JPanel implements ChartChangeListener,
     public static final int DEFAULT_MINIMUM_DRAW_HEIGHT = 200;
 
     /** The default limit above which chart scaling kicks in. */
-    public static final int DEFAULT_MAXIMUM_DRAW_WIDTH = 1024;
+    public static final int DEFAULT_MAXIMUM_DRAW_WIDTH = 2048;
 
     /** The default limit above which chart scaling kicks in. */
-    public static final int DEFAULT_MAXIMUM_DRAW_HEIGHT = 768;
+    public static final int DEFAULT_MAXIMUM_DRAW_HEIGHT = 1536;
 
     /** The minimum size required to perform a zoom on a rectangle */
     public static final int DEFAULT_ZOOM_TRIGGER_DISTANCE = 10;
@@ -1582,6 +1582,7 @@ public class ChartPanel extends JPanel implements ChartChangeListener,
                 this.chartBufferWidth = scaledWidth;
                 this.chartBufferHeight = scaledHeight;
                 GraphicsConfiguration gc = g2.getDeviceConfiguration();
+                
                 this.chartBuffer = gc.createCompatibleImage(
                         this.chartBufferWidth, this.chartBufferHeight,
                         Transparency.TRANSLUCENT);
@@ -1626,6 +1627,7 @@ public class ChartPanel extends JPanel implements ChartChangeListener,
 
             // zap the buffer onto the panel...
             g2.drawImage(this.chartBuffer, insets.left, insets.top, (int) available.getWidth(), (int) available.getHeight(), this);
+            g2.addRenderingHints(this.chart.getRenderingHints()); // bug#187
 
         } else { // redrawing the chart every time...
             AffineTransform saved = g2.getTransform();

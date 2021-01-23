@@ -27,14 +27,10 @@
  * -----------------------
  * KeyedValuesItemKey.java
  * -----------------------
- * (C) Copyright 2014, by Object Refinery Limited.
+ * (C) Copyright 2014-2020, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 18-Aug-2014 : Version 1, based on code from Orson Charts (DG);
+ * Contributor(s):   Tracy Hiltbrand;
  *
  */
 
@@ -43,6 +39,9 @@ package org.jfree.data;
 import java.io.Serializable;
 import org.jfree.chart.util.Args;
 
+/**
+ * A reference to a specific item in a {@link KeyedValues} data structure.
+ */
 public class KeyedValuesItemKey implements ItemKey, Serializable {
     
     /** The key for the item. */
